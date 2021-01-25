@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Instagram</string>
+    <string name="login_title">Login to your app</string>
+    <string name="register_title">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="log_in">LOG IN</string>
+    <string name="or">OR</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="username">Username</string>
+    <string name="bio">A short bio</string>
+    <string name="set_display_picture">Set Display Picture</string>
+    <string name="default_profile">default profile</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="username_default">Username</string>
+    <string name="bio_default">Bio</string>
+
+</resources>
