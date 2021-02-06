@@ -29,6 +29,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,14 +47,16 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = "Signup";
     private ImageView Profile;
     private Button Signup;
-    private Bitmap bitmapProfile;
+    private Bitmap bitmapPic;
     private EditText userEmail, userPassword, userConfirmPassword, userName, userBio;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db_users;
     private ProgressDialog progressDialog;
+    private StorageReference storageReference;
+    private ByteArrayOutputStream bs;
     private String userUID;
     private String email, password, confirmPassword, username, bio;
-    private String user_username, user_bio;
+    private String user_username, user_bio, user_displayPicPath;
 
 
     @Override
@@ -59,7 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        //set title for main activity(login)
+        //set title for activity_register(register)
         setTitle(R.string.register_title);
         setContentView(R.layout.activity_register);
 
@@ -68,6 +73,8 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db_users = FirebaseFirestore.getInstance();
         progressDialog = new ProgressDialog(this);
+        storageReference = FirebaseStorage.getInstance().getReference();
+
 
         userEmail.addTextChangedListener(new TextWatcher() {
             @Override
@@ -119,17 +126,15 @@ public class RegisterActivity extends AppCompatActivity {
                                         Log.d(TAG, "createUserWithEmail:success");
                                         FirebaseUser user = mAuth.getCurrentUser();
                                         userUID = user.getUid();
-                                        // Save username&bio to firestore "users"
+                                        // Save username, bio, displayPicPath to firestore "users"
                                         saveData();
-                                        // Transfer profile bitmap to profile page(temporary)
-                                        transferBitmap();
-                                        progressDialog.dismiss();
+                                        // Save display pic to Storage
+                                        savePic();
                                     } else {
                                         // If sign in fails, display a message to the user.
                                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                         Toast.makeText(RegisterActivity.this, "Signup failed.",
                                                 Toast.LENGTH_SHORT).show();
-                                        progressDialog.dismiss();
                                     }
 
                                 }
@@ -167,9 +172,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            bitmapProfile = imageBitmap;
-            Profile.setImageBitmap(imageBitmap);
+            Bitmap originBitmap = (Bitmap) extras.get("data");
+            // downscale the captured image to 1024*1024 resolution
+            bitmapPic = Bitmap.createScaledBitmap(originBitmap, 1024, 1024, true);
+            Profile.setImageBitmap(bitmapPic);
         }
     }
 
@@ -181,7 +187,6 @@ public class RegisterActivity extends AppCompatActivity {
         userConfirmPassword = findViewById(R.id.reg_confirm_password_text);
         userName = findViewById(R.id.reg_username_text);
         userBio = findViewById(R.id.reg_bio_text);
-
     }
 
     // validate all the information are filled
@@ -200,35 +205,58 @@ public class RegisterActivity extends AppCompatActivity {
         }
         return result;
     }
+
     private boolean isEmailValid(CharSequence email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    // Transfer profile bitmap to profile page(temporary)
-    private void transferBitmap() {
-        Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
-        if (bitmapProfile != null ) {
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            bitmapProfile.compress(Bitmap.CompressFormat.PNG, 50, bs);
-            intent.putExtra("byteArray", bs.toByteArray());
-        }
-        startActivity(intent);
     }
 
     private void saveData() {
         // Create a new user with username, bio and display profile pic path
         user_username = userName.getText().toString();
         user_bio = userBio.getText().toString();
+        user_displayPicPath = userUID + "/" + "displayPic.jpeg";
 
         Map<String, Object> user = new HashMap<>();
         user.put("username", user_username);
         user.put("bio", user_bio);
-        //user.put("displayPicPath", user_PicPath);
+        user.put("displayPicPath", user_displayPicPath);
 
         // Add a new document with user_uid(from authentication)
         db_users.collection("users")
                 .document(userUID)
                 .set(user);
+    }
+
+    private void savePic() {
+        StorageReference imageReference = storageReference.child(userUID).child("displayPic.jpeg");  //Users uid/displayPic.jpg
+        transferBitmap();
+        byte[] data = bs.toByteArray();
+        UploadTask uploadTask = imageReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(RegisterActivity.this, "Upload failed!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                progressDialog.dismiss();
+                Toast.makeText(RegisterActivity.this, "Upload successful!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // encode the images into a compressed format
+    private void transferBitmap() {
+        if (bitmapPic != null ) {
+            bs = new ByteArrayOutputStream();
+            bitmapPic.compress(Bitmap.CompressFormat.JPEG, 80, bs);
+        }
+        else {
+            Toast.makeText(RegisterActivity.this, "Please take your profile picture.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

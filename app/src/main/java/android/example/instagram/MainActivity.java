@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //set title for main activity(login)
+        //set title for activity_main(login)
         setTitle(R.string.login_title);
         setContentView(R.layout.activity_main);
 
