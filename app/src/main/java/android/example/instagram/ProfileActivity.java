@@ -81,12 +81,14 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         //uploadPhotos = new ArrayList<>();
+        progressDialog = new ProgressDialog(ProfileActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setProgressStyle(1);
+        progressDialog.show();
 
-        recyclerProfile = findViewById(R.id.recycler_profile);
-        progressDialog = new ProgressDialog(this);
-        profileThumbnail = findViewById(R.id.user_profile);
-        username = findViewById(R.id.username);
-        bio = findViewById(R.id.bio);
+        initializeView();
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(ProfileActivity.this,3,GridLayoutManager.VERTICAL,false);
+        recyclerProfile.setLayoutManager(gridLayoutManager);
 
         mAuth = FirebaseAuth.getInstance();
         db_users = FirebaseFirestore.getInstance();
@@ -108,17 +110,14 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
             userUID = currentUser.getUid();
-            progressDialog.setMessage("Loading...");
-            progressDialog.setProgressStyle(1);
-            progressDialog.show();
             // read data from firestore using userUID and set text
             readData();
             // download display pic from Storage and display
             downloadPic();
             // download all uploaded photos of the current user
             downloadPhotos();
-            progressDialog.dismiss();
         }
+        progressDialog.dismiss();
     }
 
 
@@ -262,18 +261,23 @@ public class ProfileActivity extends AppCompatActivity {
                             Collections.sort(photo_time, Collections.reverseOrder());
 
                             // create recycler view-adpater(data)-connect-grid layout manager
-                            if(photo_time.size() != 0) {
-                                //Log.d("adapter0", String.valueOf(photo_time.size()));
-                                adapter = new PhotoAdapter(ProfileActivity.this, photo_time, userUID);
-                                GridLayoutManager gridLayoutManager = new GridLayoutManager(ProfileActivity.this,3,GridLayoutManager.VERTICAL,false);
-                                recyclerProfile.setLayoutManager(gridLayoutManager);
-                                recyclerProfile.setAdapter(adapter);
-                            }
+
+                            Log.d("adapter0", String.valueOf(photo_time.size()));
+                            adapter = new PhotoAdapter(ProfileActivity.this, photo_time, userUID);
+                            recyclerProfile.setAdapter(adapter);
+
                         } else {
                             Log.d("Uploaded photos", "Error getting documents: ", task.getException());
                         }
                     }
                 });
+    }
+
+    private void initializeView() {
+        recyclerProfile = findViewById(R.id.recycler_profile);
+        profileThumbnail = findViewById(R.id.user_profile);
+        username = findViewById(R.id.username);
+        bio = findViewById(R.id.bio);
     }
 
 }

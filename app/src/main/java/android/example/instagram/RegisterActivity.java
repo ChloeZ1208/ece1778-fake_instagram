@@ -197,10 +197,13 @@ public class RegisterActivity extends AppCompatActivity {
         username = userName.getText().toString().trim();
         bio = userBio.getText().toString().trim();
 
-        if(password.isEmpty() || email.isEmpty() || username.isEmpty() || confirmPassword.isEmpty() || bio.isEmpty()){
+        if (password.isEmpty() || email.isEmpty() || username.isEmpty() || confirmPassword.isEmpty() || bio.isEmpty()){
             Toast.makeText(RegisterActivity.this, "Please enter all the details", Toast.LENGTH_SHORT).show();
         }
-        else{
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(RegisterActivity.this, "Password does not match!", Toast.LENGTH_SHORT).show();
+        }
+        else {
             result = true;
         }
         return result;

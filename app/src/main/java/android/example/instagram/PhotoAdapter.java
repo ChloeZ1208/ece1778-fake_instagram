@@ -1,6 +1,8 @@
 package android.example.instagram;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -8,11 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,26 +27,27 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     List<String> photos;
     String userUID;
-    LayoutInflater inflater;
+    Context ctx;
+
+    StorageReference storageRef = FirebaseStorage.getInstance().getReference();;
+    StorageReference pathReference;
 
 
     public PhotoAdapter(Context ctx, List<String> photos, String userUID) {
         this.photos = photos;
         this.userUID = userUID;
-        this.inflater = LayoutInflater.from(ctx);
+        this.ctx = ctx;
     }
 
     @NonNull
     @Override
     public PhotoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.photo_view, parent, false);
+        View view = LayoutInflater.from(ctx).inflate(R.layout.photo_view, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();;
-        StorageReference pathReference;
         String path = userUID + "/" + photos.get(position) + ".jpeg";
         pathReference = storageRef.child(path);
         pathReference.getBytes(1024 * 1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -85,19 +86,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                     * TODO: click-full screen
                      */
                     // Get the position of the item that was clicked.
-                    if (!status) {
-                        //int mPosition = getLayoutPosition();
-                        //byte[] clicked = photo_bytes.get(mPosition);
-                        //Bitmap b = BitmapFactory.decodeByteArray(clicked, 0, clicked.length);
-                        //photo_view_item.setImageBitmap(b);
-                        photo_view_item.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
-                        status = true;
-                    }
-                    else if (status) {
-                        photo_view_item.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
-                        photo_view_item.setAdjustViewBounds(true);
-                        status = false;
-                    }
+                    int mPosition = getLayoutPosition();
+                    String path = userUID + "/" + photos.get(mPosition) + ".jpeg";
+                    Intent intent = new Intent(ctx,  FullscreenActivity.class);
+                    intent.putExtra("click_path", path);
+                    ctx.startActivity(intent);
                 }
             });
 

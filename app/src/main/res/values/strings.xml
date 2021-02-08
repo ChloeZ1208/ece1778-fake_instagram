@@ -15,5 +15,9 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="username_default">Username</string>
     <string name="bio_default">Bio</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="close">Close</string>
 
 </resources>

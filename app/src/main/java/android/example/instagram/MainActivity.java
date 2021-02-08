@@ -91,19 +91,24 @@ public class MainActivity extends AppCompatActivity {
     private void validate(String email, String password) {
         progressDialog.setMessage("Loading...");
         progressDialog.show();
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    progressDialog.dismiss();
-                    Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                }else{
-                    Toast.makeText(MainActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
+        if (email.isEmpty() || password.isEmpty()) {
+            progressDialog.dismiss();
+            Toast.makeText(MainActivity.this, "Please enter all the details.", Toast.LENGTH_SHORT).show();
+        } else {
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()){
+                        progressDialog.dismiss();
+                        Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(MainActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private boolean isEmailValid(CharSequence email) {
