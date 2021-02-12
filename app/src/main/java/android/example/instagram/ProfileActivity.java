@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView profileThumbnail;
     private TextView username;
     private TextView bio;
+    private BottomNavigationView bottomNav;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db_users;
     private String userUID, timeStamp;
@@ -62,10 +64,9 @@ public class ProfileActivity extends AppCompatActivity {
     private StorageReference storageRef;
     private StorageReference pathReference;
 
-    private PhotoAdapter adapter;
+    private GlobalAdapter adapter;
     private RecyclerView recyclerProfile;
 
-    //private List<byte[]> uploadPhotos;
     private List<String> photo_time;
 
     final long ONE_MEGABYTE = 1024 * 1024;
@@ -93,6 +94,21 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db_users = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference();
+
+        // bottom navigation
+        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()) {
+                    case R.id.profile_page:
+                        break;
+                    case R.id.global_feed_page:
+                        startActivity(new Intent(ProfileActivity.this, GlobalFeedActivity.class));
+                        break;
+                }
+                return false;
+            }
+        });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +145,9 @@ public class ProfileActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap originBitmap = (Bitmap) extras.get("data");
             bitmapPhoto = Bitmap.createScaledBitmap(originBitmap, 1024, 1024, true);
+            /*
+            * TODO: redirect to photo caption page
+             */
             baos = new ByteArrayOutputStream();
             bitmapPhoto.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             currentPhotoData = baos.toByteArray();
@@ -246,6 +265,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void downloadPhotos(){
         // query photos(firestore) to get StorageReference
         photo_time = new ArrayList<>();
+        List<String> photo_path = new ArrayList<>();
         db_users.collection("photos")
                 .whereEqualTo("uid", userUID)
                 .get()
@@ -259,11 +279,14 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                             // Sorting storageReference in chronological older
                             Collections.sort(photo_time, Collections.reverseOrder());
+                            for (String time: photo_time) {
+                                String path = userUID + "/" + time + ".jpeg";
+                                photo_path.add(path);
+                            }
 
-                            // create recycler view-adpater(data)-connect-grid layout manager
-
-                            Log.d("adapter0", String.valueOf(photo_time.size()));
-                            adapter = new PhotoAdapter(ProfileActivity.this, photo_time, userUID);
+                            // create recycler view-adpater(data)-connect-grid layout manage
+                            //Log.d("adapter0", String.valueOf(photo_time.size()));
+                            adapter = new GlobalAdapter(ProfileActivity.this, photo_path);
                             recyclerProfile.setAdapter(adapter);
 
                         } else {
@@ -278,6 +301,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileThumbnail = findViewById(R.id.user_profile);
         username = findViewById(R.id.username);
         bio = findViewById(R.id.bio);
+        bottomNav = findViewById(R.id.bottom_navigation);
     }
 
 }

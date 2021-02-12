@@ -37,7 +37,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String clickPath = intent.getStringExtra("click_path");
-
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();;
         StorageReference pathReference;
         pathReference = storageRef.child(clickPath);

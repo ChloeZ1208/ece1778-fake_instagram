@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,42 +19,38 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
+public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder> {
 
-    List<String> photos;
-    String userUID;
+    List<String> photo_paths;
     Context ctx;
 
     StorageReference storageRef = FirebaseStorage.getInstance().getReference();;
     StorageReference pathReference;
 
 
-    public PhotoAdapter(Context ctx, List<String> photos, String userUID) {
-        this.photos = photos;
-        this.userUID = userUID;
+    public GlobalAdapter(Context ctx, List<String> photos) {
+        this.photo_paths = photos;
         this.ctx = ctx;
     }
 
     @NonNull
     @Override
-    public PhotoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public GlobalAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(ctx).inflate(R.layout.photo_view, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String path = userUID + "/" + photos.get(position) + ".jpeg";
-        pathReference = storageRef.child(path);
+        pathReference = storageRef.child(photo_paths.get(position));
         pathReference.getBytes(1024 * 1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 holder.photo_view_item.setImageBitmap(bitmap);
-                Log.d("storage", path);
+                Log.d("storage", photo_paths.get(position));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -67,12 +62,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        Log.d("adapter", String.valueOf(photos.size()));
-        return photos.size();
+        Log.d("Global_adapter", String.valueOf(photo_paths.size()));
+        return photo_paths.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        boolean status = false;
         ImageView photo_view_item;
 
         public ViewHolder(View itemView) {
@@ -83,13 +77,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                 @Override
                 public void onClick(View view) {
                     /*
-                    * TODO: click-full screen
+                     * TODO: click-comments page
                      */
                     // Get the position of the item that was clicked.
                     int mPosition = getLayoutPosition();
-                    String path = userUID + "/" + photos.get(mPosition) + ".jpeg";
                     Intent intent = new Intent(ctx,  FullscreenActivity.class);
-                    intent.putExtra("click_path", path);
+                    intent.putExtra("click_path", photo_paths.get(mPosition));
                     ctx.startActivity(intent);
                 }
             });
