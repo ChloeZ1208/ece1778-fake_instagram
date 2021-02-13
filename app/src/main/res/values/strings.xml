@@ -19,5 +19,9 @@
     <string name="close">Close</string>
     <string name="profile">Profile</string>
     <string name="feed">Feed</string>
+    <string name="write_a_caption">Write a caption...</string>
+    <string name="enable_auto_hashtags">Enable Auto Hashtags</string>
+    <string name="post">Post</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

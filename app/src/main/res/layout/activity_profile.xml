@@ -27,8 +27,8 @@
         android:layout_height="48dp"
         android:layout_gravity="bottom"
         android:background="@color/app_bar"
-        app:itemTextColor="#45525E"
-        app:itemIconTint="@color/status_bar"
+        app:itemIconTint="@color/navbar_color"
+        app:itemTextColor="@color/navbar_color"
         app:menu="@menu/bottom_navigation_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

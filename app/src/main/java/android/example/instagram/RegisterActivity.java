@@ -254,7 +254,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void transferBitmap() {
         if (bitmapPic != null ) {
             bs = new ByteArrayOutputStream();
-            bitmapPic.compress(Bitmap.CompressFormat.JPEG, 80, bs);
+            bitmapPic.compress(Bitmap.CompressFormat.JPEG, 100, bs);
         }
         else {
             Toast.makeText(RegisterActivity.this, "Please take your profile picture.",

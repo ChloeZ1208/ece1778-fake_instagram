@@ -39,6 +39,8 @@ public class GlobalFeedActivity extends AppCompatActivity {
         recyclerFeed = findViewById(R.id.recycler_feed);
         bottomNav = findViewById(R.id.bottom_navigation_global);
 
+        bottomNav.getMenu().findItem(R.id.global_feed_page).setChecked(true);
+
         GridLayoutManager gridLayoutManager = new GridLayoutManager(GlobalFeedActivity.this,1,GridLayoutManager.VERTICAL,false);
         recyclerFeed.setLayoutManager(gridLayoutManager);
         downloadPhotos();
@@ -54,7 +56,7 @@ public class GlobalFeedActivity extends AppCompatActivity {
                     case R.id.global_feed_page:
                         break;
                 }
-                return false;
+                return true;
             }
         });
     }

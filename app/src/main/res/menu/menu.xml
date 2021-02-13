@@ -6,7 +6,8 @@
         android:id="@+id/logoutMenu"
         android:orderInCategory="100"
         android:title="Logout"
-        app:showAsAction="never" />
+        android:icon="@drawable/logout_icon"
+        app:showAsAction="always" />
 
 
 </menu>

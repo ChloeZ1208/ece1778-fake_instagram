@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -81,12 +82,6 @@ public class ProfileActivity extends AppCompatActivity {
         setTitle("Profile");
         setContentView(R.layout.activity_profile);
 
-        //uploadPhotos = new ArrayList<>();
-        progressDialog = new ProgressDialog(ProfileActivity.this);
-        progressDialog.setMessage("Loading...");
-        progressDialog.setProgressStyle(1);
-        progressDialog.show();
-
         initializeView();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(ProfileActivity.this,3,GridLayoutManager.VERTICAL,false);
         recyclerProfile.setLayoutManager(gridLayoutManager);
@@ -94,6 +89,9 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db_users = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference();
+
+
+        bottomNav.getMenu().findItem(R.id.profile_page).setChecked(true);
 
         // bottom navigation
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -106,7 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
                         startActivity(new Intent(ProfileActivity.this, GlobalFeedActivity.class));
                         break;
                 }
-                return false;
+                return true;
             }
         });
 
@@ -133,7 +131,6 @@ public class ProfileActivity extends AppCompatActivity {
             // download all uploaded photos of the current user
             downloadPhotos();
         }
-        progressDialog.dismiss();
     }
 
 
@@ -145,18 +142,19 @@ public class ProfileActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap originBitmap = (Bitmap) extras.get("data");
             bitmapPhoto = Bitmap.createScaledBitmap(originBitmap, 1024, 1024, true);
+            timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            baos = new ByteArrayOutputStream();
+            bitmapPhoto.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            currentPhotoData = baos.toByteArray();
             /*
             * TODO: redirect to photo caption page
              */
-            baos = new ByteArrayOutputStream();
-            bitmapPhoto.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            currentPhotoData = baos.toByteArray();
+            Intent intent = new Intent(ProfileActivity.this, PhotoCaptionActivity.class);
+            intent.putExtra("byteArray", currentPhotoData);
+            intent.putExtra("uid", userUID);
+            intent.putExtra("timestamp", timeStamp);
+            startActivity(intent);
 
-            timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-
-            // Uploading current photo
-            savePhoto();
-            savePhotoPath();
         }
     }
 
@@ -181,44 +179,6 @@ public class ProfileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // save uploaded photo to storage
-    private void savePhoto() {
-        progressDialog.setMessage("Uploading...");
-        progressDialog.setMax(1);
-        progressDialog.setProgressStyle(1);
-        progressDialog.incrementProgressBy(2);
-        progressDialog.show();
-        String photoName = timeStamp + ".jpeg";
-        StorageReference photoReference = storageRef.child(userUID).child(photoName);
-        UploadTask uploadTask = photoReference.putBytes(currentPhotoData);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ProfileActivity.this, "Upload failed!", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                progressDialog.dismiss();
-                Toast.makeText(ProfileActivity.this, "Upload successful!", Toast.LENGTH_SHORT).show();
-                // Notify adapter new photo inserted
-                int insertIndex = 0;
-                photo_time.add(insertIndex, timeStamp);
-                adapter.notifyItemInserted(insertIndex);
-            }
-        });
-    }
-
-    // save photo Path to firebase
-    private void savePhotoPath() {
-        Map<String, Object> photo = new HashMap<>();
-
-        photo.put("uid", userUID);
-        photo.put("timestamp", timeStamp);
-
-        db_users.collection("photos")
-                .add(photo);
-    }
 
     // download Profile photo as activity starts
     private void downloadPic() {
