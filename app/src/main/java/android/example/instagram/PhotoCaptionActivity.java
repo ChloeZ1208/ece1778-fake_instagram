@@ -7,9 +7,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -17,13 +20,20 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PhotoCaptionActivity extends AppCompatActivity {
@@ -31,6 +41,7 @@ public class PhotoCaptionActivity extends AppCompatActivity {
     private String userUID;
     private String timeStamp;
     private String caption;
+    private Bitmap cameraBitmap;
     private byte[] currentPhotoData;
     private ImageView cameraPhoto;
     private EditText captionTxt;
@@ -63,7 +74,7 @@ public class PhotoCaptionActivity extends AppCompatActivity {
         timeStamp = intent.getStringExtra("timestamp");
         currentPhotoData = intent.getByteArrayExtra("byteArray");
         // set image bitmap
-        Bitmap cameraBitmap = BitmapFactory.decodeByteArray(currentPhotoData,0,currentPhotoData.length);
+        cameraBitmap = BitmapFactory.decodeByteArray(currentPhotoData,0,currentPhotoData.length);
         cameraPhoto.setImageBitmap(cameraBitmap);
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +95,15 @@ public class PhotoCaptionActivity extends AppCompatActivity {
                     savePhoto();
                 }
 
+            }
+        });
+
+        hashTag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    imageLabel();
+                }
             }
         });
     }
@@ -125,5 +145,37 @@ public class PhotoCaptionActivity extends AppCompatActivity {
 
         db_users.collection("photos")
                 .add(photo);
+    }
+
+    // image label
+    private void imageLabel() {
+        // create InputImage object
+        InputImage image = InputImage.fromBitmap(cameraBitmap, 0);
+        // First get an instance of ImageLabeler
+        ImageLabelerOptions options =
+                new ImageLabelerOptions.Builder().setConfidenceThreshold(0.8f).build();
+        ImageLabeler labeler = ImageLabeling.getClient(options);
+        // Then, pass the image to the process() method
+        labeler.process(image)
+                .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                    @Override
+                    public void onSuccess(List<ImageLabel> labels) {
+                        // Task completed successfully
+                        for (ImageLabel label : labels) {
+                            String text = label.getText();
+                            //float confidence = label.getConfidence();
+                            captionTxt.append("#" + text);
+                            Log.d("caption", text);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        Toast.makeText(PhotoCaptionActivity.this, "Fail to process the image", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 }
