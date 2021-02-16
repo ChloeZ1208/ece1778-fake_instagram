@@ -62,7 +62,7 @@ public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        Log.d("Global_adapter", String.valueOf(photo_paths.size()));
+        //Log.d("Global_adapter", String.valueOf(photo_paths.size()));
         return photo_paths.size();
     }
 
@@ -81,7 +81,7 @@ public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder
                      */
                     // Get the position of the item that was clicked.
                     int mPosition = getLayoutPosition();
-                    Intent intent = new Intent(ctx,  FullscreenActivity.class);
+                    Intent intent = new Intent(ctx,  CommentsActivity.class);
                     intent.putExtra("click_path", photo_paths.get(mPosition));
                     ctx.startActivity(intent);
                 }

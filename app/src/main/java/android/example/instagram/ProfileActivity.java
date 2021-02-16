@@ -162,19 +162,8 @@ public class ProfileActivity extends AppCompatActivity {
             bitmapPhoto.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             currentPhotoData = baos.toByteArray();
 
-            //cameraID = cameraDevice.getId();
-            //Log.d("camera_id", cameraID);
-            /*
-            try {
-                int rotationDegree = getRotationCompensation(cameraID, this, false);
-            } catch (CameraAccessException e) {
-                e.printStackTrace();
-            }
-             */
+            //Log.d("cameraPhoto", String.valueOf(currentPhotoData.length));
 
-            /*
-            * TODO: redirect to photo caption page
-             */
             Intent intent = new Intent(ProfileActivity.this, PhotoCaptionActivity.class);
             intent.putExtra("byteArray", currentPhotoData);
             intent.putExtra("uid", userUID);

@@ -1,6 +1,7 @@
 package android.example.instagram;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraDevice;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -57,6 +59,9 @@ public class PhotoCaptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_caption);
 
+        setTitle("Post");
+        setContentView(R.layout.activity_photo_caption);
+
         progressDialog = new ProgressDialog(PhotoCaptionActivity.this);
         storageRef = FirebaseStorage.getInstance().getReference();
         db_users = FirebaseFirestore.getInstance();
@@ -67,6 +72,11 @@ public class PhotoCaptionActivity extends AppCompatActivity {
         postBtn = findViewById(R.id.post_btn);
         captionTxt = findViewById(R.id.caption);
         hashTag = findViewById(R.id.hashtag);
+
+        // Get a support ActionBar corresponding to this appbar
+        ActionBar ab = getSupportActionBar();
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
 
         // get all the information of camera photo
         Intent intent = getIntent();
