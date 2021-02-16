@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:autofillHints=""
-                android:ems="10"
+                android:textSize="16sp"
                 android:hint="@string/write_a_caption"
                 android:inputType="textMultiLine" />
 
@@ -46,12 +46,12 @@
                 android:layout_marginTop="16dp"
                 android:fontFamily="sans-serif-medium"
                 android:splitTrack="true"
-                android:switchPadding="100dp"
+                android:switchPadding="120dp"
                 android:switchTextAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:text="@string/enable_auto_hashtags"
-                android:textAlignment="center"
+                android:textAlignment="viewStart"
                 android:textColor="@color/login_grey"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:trackTint="@color/login_grey"
                 app:layout_constraintVertical_bias="0.0" />

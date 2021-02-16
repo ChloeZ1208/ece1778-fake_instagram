@@ -77,8 +77,6 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private StorageReference storageRef;
     private StorageReference pathReference;
-    private CameraDevice cameraDevice;
-    private String cameraID;
 
     private GlobalAdapter adapter;
     private RecyclerView recyclerProfile;
@@ -157,7 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap originBitmap = (Bitmap) extras.get("data");
             bitmapPhoto = Bitmap.createScaledBitmap(originBitmap, 1024, 1024, true);
-            timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA).format(new Date());
             baos = new ByteArrayOutputStream();
             bitmapPhoto.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             currentPhotoData = baos.toByteArray();
