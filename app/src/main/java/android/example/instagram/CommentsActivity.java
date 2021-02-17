@@ -3,6 +3,8 @@ package android.example.instagram;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -54,6 +58,10 @@ public class CommentsActivity extends AppCompatActivity {
     private StorageReference pathReference;
     private StorageReference storageRef;
     private String currUid; // current login user uid
+    private MaterialToolbar topAppBar;
+
+    private RecyclerView recyclerComment;
+    //private CommentAdapter adapter;
 
 
     @Override
@@ -64,11 +72,11 @@ public class CommentsActivity extends AppCompatActivity {
         setTitle("Comments");
         setContentView(R.layout.activity_comments);
 
-        clickPhoto = findViewById(R.id.click_photo);
-        captionTxt = findViewById(R.id.caption_txt);
-        commentTxt = findViewById(R.id.comment_txt);
-        commentPostBtn = findViewById(R.id.comment_post_btn);
+        initializeViews();
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(CommentsActivity.this,1,GridLayoutManager.VERTICAL,false);
+        recyclerComment.setLayoutManager(gridLayoutManager);
+        
         // Get photo, photo timestamp and photo owner uid from clickPath
         Intent intent = getIntent();
         clickPath = intent.getStringExtra("click_path");
@@ -94,16 +102,32 @@ public class CommentsActivity extends AppCompatActivity {
         // download caption
         downloadCaption();
 
-        commentPostBtn.setOnClickListener(new View.OnClickListener() {
+        topAppBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                newComment = commentTxt.getText().toString();
-                if (newComment.isEmpty()) {
-                    Toast.makeText(CommentsActivity.this, "Please add a comment", Toast.LENGTH_SHORT).show();
-                } else {
-                    addComment();
-                    commentTxt.getText().clear();
+                Toast.makeText(CommentsActivity.this, "Back Navigation", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (currUid.equals(photoOwnerUid)) {
+            //topAppBar.getMenu();
+            topAppBar.inflateMenu(R.menu.delete_menu);
+            topAppBar.setOnMenuItemClickListener(menuItem -> {
+                if(menuItem.getItemId() == R.id.deleteMenu) {
+                    Toast.makeText(this, "Successfully delete this post", Toast.LENGTH_LONG).show();
+                    return true;
                 }
+                return false;
+            });
+        }
+
+        commentPostBtn.setOnClickListener(v -> {
+            newComment = commentTxt.getText().toString();
+            if (newComment.isEmpty()) {
+                Toast.makeText(CommentsActivity.this, "Please add a comment", Toast.LENGTH_SHORT).show();
+            } else {
+                addComment();
+                commentTxt.getText().clear();
             }
         });
     }
@@ -148,26 +172,11 @@ public class CommentsActivity extends AppCompatActivity {
                 .add(comment);
     }
 
-    // create menu (delete)
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (currUid.equals(photoOwnerUid)) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.delete_menu, menu);
-            return true;
-        }
-        return false;
-    }
-
-    // menu-delete post
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.deleteMenu) {
-            /*
-            * TODO: delete post
-             */
-            Toast.makeText(this, "Successfully delete this post", Toast.LENGTH_LONG).show();
-        }
-        return super.onOptionsItemSelected(item);
+    private void initializeViews() {
+        clickPhoto = findViewById(R.id.click_photo);
+        captionTxt = findViewById(R.id.caption_txt);
+        commentTxt = findViewById(R.id.comment_txt);
+        commentPostBtn = findViewById(R.id.comment_post_btn);
+        topAppBar = findViewById(R.id.top_app_bar);
     }
 }

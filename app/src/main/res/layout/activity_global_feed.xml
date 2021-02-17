@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="3dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -20,8 +20,8 @@
         android:layout_height="48dp"
         android:layout_gravity="bottom"
         android:background="@color/app_bar"
-        app:menu="@menu/bottom_navigation_menu"
         app:itemIconTint="@color/navbar_color"
-        app:itemTextColor="@color/navbar_color"/>
+        app:itemTextColor="@color/navbar_color"
+        app:menu="@menu/bottom_navigation_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

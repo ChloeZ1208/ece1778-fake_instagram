@@ -16,8 +16,9 @@
         <activity android:parentActivityName=".ProfileActivity" android:name=".PhotoCaptionActivity" />
         <activity
             android:name=".GlobalFeedActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".CommentsActivity" />
+            android:theme="@style/Theme.Instagram.NoActionBar" />
+        <activity android:name=".CommentsActivity"
+            android:theme="@style/Theme.Instagram.NoActionBar"/>
         <activity android:name=".ProfileActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity">

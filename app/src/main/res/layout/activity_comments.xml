@@ -4,49 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".CommentsActivity">
 
-    <com.google.android.material.card.MaterialCardView
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="340dp"
+        android:fitsSystemWindows="true"
+        android:background="@color/app_bar"
+        app:layout_scrollFlags="scroll|enterAlways|snap"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:layout_collapseMode="parallax"
+            app:contentScrim="@color/app_bar"
+            app:statusBarScrim="@color/status_bar"
+            app:expandedTitleMarginStart="72dp"
+            app:expandedTitleMarginBottom="28dp"
+            app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed">
 
             <ImageView
                 android:id="@+id/click_photo"
                 android:layout_width="match_parent"
-                android:layout_height="320dp" />
+                android:layout_height="match_parent"
+                app:layout_collapseMode="parallax"
+                android:scaleType="centerCrop"
+                android:fitsSystemWindows="true"/>
 
-            <TextView
-                android:id="@+id/caption_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/caption"
-                android:textAlignment="viewStart"
-                android:textColor="@color/login_grey"
-                android:textSize="16sp"
-                android:textStyle="italic" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/top_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_collapseMode="pin"
+                app:title="Comments"
+                app:navigationIcon="@drawable/back_icon"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-    <LinearLayout
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBar"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TextView
+            android:id="@+id/caption_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caption"
+            android:textAlignment="viewStart"
+            android:textColor="@color/login_grey"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -57,9 +110,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
             android:autofillHints=""
-            android:textSize="16sp"
             android:hint="@string/add_a_comment"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:textSize="16sp" />
 
         <ImageButton
             android:id="@+id/comment_post_btn"
