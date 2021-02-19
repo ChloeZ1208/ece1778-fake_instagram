@@ -76,7 +76,9 @@ public class PhotoCaptionActivity extends AppCompatActivity {
         // Get a support ActionBar corresponding to this appbar
         ActionBar ab = getSupportActionBar();
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        if(ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         // get all the information of camera photo
         Intent intent = getIntent();
@@ -139,8 +141,6 @@ public class PhotoCaptionActivity extends AppCompatActivity {
                 progressDialog.dismiss();
                 Toast.makeText(PhotoCaptionActivity.this, "Upload successful!", Toast.LENGTH_SHORT).show();
                 // Notify adapter new photo inserted
-                //photo_time.add(0, timeStamp);
-                //adapter.notifyItemInserted(0);
                 startActivity(new Intent(PhotoCaptionActivity.this, ProfileActivity.class));
             }
         });

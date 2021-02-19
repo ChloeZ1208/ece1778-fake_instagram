@@ -1,6 +1,5 @@
 package android.example.instagram;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -55,7 +54,7 @@ public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.w("Uploaded photos", "Error occurred during downloading.");
+                Log.w("Downloaded photos", "Error occurred during downloading.");
             }
         });
     }
@@ -71,14 +70,11 @@ public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder
 
         public ViewHolder(View itemView) {
             super(itemView);
-            photo_view_item =itemView.findViewById(R.id.photoView);
+            photo_view_item = itemView.findViewById(R.id.photoView);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /*
-                     * TODO: click-comments page
-                     */
                     // Get the position of the item that was clicked.
                     int mPosition = getLayoutPosition();
                     Intent intent = new Intent(ctx,  CommentsActivity.class);
@@ -89,6 +85,4 @@ public class GlobalAdapter extends RecyclerView.Adapter<GlobalAdapter.ViewHolder
 
         }
     }
-
-
 }
