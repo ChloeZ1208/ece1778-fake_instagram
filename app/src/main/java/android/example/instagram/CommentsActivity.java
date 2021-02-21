@@ -130,7 +130,6 @@ public class CommentsActivity extends AppCompatActivity {
             topAppBar.inflateMenu(R.menu.delete_menu);
             topAppBar.setOnMenuItemClickListener(menuItem -> {
                 if(menuItem.getItemId() == R.id.deleteMenu) {
-                    Toast.makeText(this, "Successfully delete this post", Toast.LENGTH_LONG).show();
                     deletePhotosFirestore();
                     deleteCommentsFirestore();
                     deletePhotoStorage();
@@ -235,16 +234,13 @@ public class CommentsActivity extends AppCompatActivity {
         comment.put("username", currUsername);
         db_users.collection(timestampPhoto)
                 .add(comment);
-        /*
-        * TODO: not tested yet
-         */
+        //
         int index = comments.size();
         comments.add(index, newComment);
         String path = currUid + "/" + "displayPic.jpeg";
         commentProfilePath.add(index, path);
         commentUsername.add(index, currUsername);
-
-        adapter.notifyItemInserted(0);
+        adapter.notifyItemInserted(index);
     }
 
     private void deletePhotosFirestore() {
@@ -264,28 +260,28 @@ public class CommentsActivity extends AppCompatActivity {
         pathReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                onBackPressed();
-                Toast.makeText(CommentsActivity.this, "File deleted successfully", Toast.LENGTH_SHORT).show();
+                Log.d("photo storage", "Photo storage successfully deleted!");
+                //onBackPressed();
+                startActivity(new Intent(CommentsActivity.this, ProfileActivity.class));
             }
         });
     }
     /*
-    * TODO: delete documents
+    * TODO: delete documents-onbackpressed norefresh
      */
     private void deleteCommentsFirestore() {
-            db_users.collection(timestampPhoto)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-                            }
-
+        db_users.collection(timestampPhoto)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            db_users.collection(timestampPhoto).document(document.getId()).delete();
                         }
-                    });
+                        Log.d("photo comments", "Photo comments successfully deleted!");
+                    }
+                });
     }
-
 
     private void initializeViews() {
         clickPhoto = findViewById(R.id.click_photo);
